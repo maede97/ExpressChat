@@ -59,7 +59,7 @@ class DataBase {
 
   insertUser(username, password) {
     return new Promise((resolve, reject) => {
-      this.db.run('INSERT INTO users(username, password, status) VALUES (?, ?, ?)', [username, password, 'Happy to check this out.'], (err) => {
+      this.db.run('INSERT INTO users(username, password) VALUES (?, ?)', [username, password], (err) => {
         if (err) {
           reject(err);
           console.log("Error on insertUser");
