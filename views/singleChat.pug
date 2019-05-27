@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1 #{toUser}
+    span.last-online  last action: UTC #{lastOnline}
+  include chat.pug
+
+block append scripts
+  script var username = '#{username}';var toUser = '#{toUser}';
+  script(src='/javascripts/singleChat.js')
+
+

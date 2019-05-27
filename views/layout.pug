@@ -1,0 +1,51 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="msapplication-TileColor" content="#ffffff")
+    meta(name="msapplication-TileImage" content="/ms-icon-144x144.png")
+    meta(name="theme-color" content="#ffffff")
+    link(rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png")
+    link(rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png")
+    link(rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png")
+    link(rel="apple-touch-icon" sizes="76x76" href="/images/apple-icon-76x76.png")
+    link(rel="apple-touch-icon" sizes="114x114" href="/images/apple-icon-114x114.png")
+    link(rel="apple-touch-icon" sizes="120x120" href="/images/apple-icon-120x120.png")
+    link(rel="apple-touch-icon" sizes="144x144" href="/images/apple-icon-144x144.png")
+    link(rel="apple-touch-icon" sizes="152x152" href="/images/apple-icon-152x152.png")
+    link(rel="apple-touch-icon" sizes="180x180" href="/images/apple-icon-180x180.png")
+    link(rel="icon" type="image/png" sizes="192x192"  href="/images/android-icon-192x192.png")
+    link(rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png")
+    link(rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png")
+    link(rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png")
+    link(rel="manifest" href="/images/manifest.json")
+    title= title
+    block styles
+      link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css')
+      link(rel='stylesheet',href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css')
+      link(rel='stylesheet',href='/stylesheets/style.css')
+    block scripts
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js')
+      script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js')
+  body
+    nav.navbar.navbar-default.navbar-fixed-top
+      div.container
+        div.navbar-header
+          button.navbar-toggle.collapsed(type='button',data-toggle='collapse',data-target='#navbar',aria-controls='navbar',aria-expanded='false',aria-label='Toggle navigation')
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand ExpressChat
+        div.collapse.navbar-collapse#navbar
+          ul.nav.navbar-nav         
+            if(loggedin)
+              li(class=(name === "home" ? "nav-item active" : "nav-item"))
+                a(href="/home") Home
+              li.nav-item
+                a(href="/logout") Logout
+            else
+              li(class=(name === "login" ? "nav-item active" : "nav-item"))
+                a(href="/login") Login
+    div.container.content
+      block content

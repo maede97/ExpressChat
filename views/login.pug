@@ -1,0 +1,56 @@
+extends layout
+
+block content
+  if(warning !== undefined)
+    div(class='alert alert-warning',role='alert')= warning
+  div.row
+    div.col-md-6.col-md-offset-3
+      div.panel.panel-login
+        div.panel-heading
+          div.row
+            div.col-xs-6
+              a(href="#" class="active" id="login-form-link") Login
+            div.col-xs-6
+              a(href="#" id="register-form-link") Register
+          hr
+        div.panel-body
+          div.row
+            div.col-lg-12
+              form(method='POST',action='/login' id='login-form' role='form' style='display:block;')
+                div.form-group
+                  input.form-control#usernameLog(name='username' placeholder='Username' tabindex='1')
+                div.form-group
+                  input.form-control#passwordLog(type='password' name='password' placeholder='Password' tabindex='2')
+                div.form-group
+                  div.row
+                    div.col-lg-12
+                      div.text-center
+                        input(class='form-control btn btn-login', id='login', value="Login", type='submit')
+                        
+              form(method='POST',action='/register' role='form' style='display:none;' id='register-form')
+                div.form-group
+                  input.form-control#usernameReg(name='username' placeholder='Username' tabindex='1')
+                div.form-group
+                  input.form-control#passwordReg(type='password' name='password' placeholder='Password' tabindex='2')
+                div.form-group
+                  div.row
+                    div.col-lg-12
+                      div.text-center
+                        input(class='form-control btn btn-register', id='register', value="Register", type='submit')
+  div.information.row
+    h2 Information
+    p This is a small proof-of-concept chat-system.
+    p Chat in real-time with complete strangers.
+    p To do so, click on any name you see (they must do so too... Otherwise they won't see your message)
+    p After a total of 100 messages sent, the oldest ones will be removed.
+    h4 Use at your own risk!
+    p This tool is not intended to be secure:
+    ul
+      li We store passwords in cleartext.
+      li We broadcast every message sent over the ether.
+      li Everyone can create an account, e.g. no validation.
+      li Maybe some XSS and/or SQL-Injections work, we didn't test that.
+block append styles
+  link(rel='stylesheet',href='/stylesheets/login.css')
+block append scripts
+  script(src='javascripts/login.js')

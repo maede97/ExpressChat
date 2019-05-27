@@ -1,0 +1,24 @@
+div.mesgs
+    div.msg_history
+        each row in chat
+            if(username == row.mFrom)
+                div.outgoing_msg
+                    div.sent_msg
+                        p
+                            span #{row.message}
+                        span.time_date UTC #{row.sent}
+            else
+                div.incoming_msg
+                    div.received_withd_msg
+                        p
+                            a(href='/chat/'+row.mFrom) #{row.mFrom}
+                            span : #{row.message}
+                        span.time_date UTC #{row.sent}
+    div.type_msg
+        div.input_msg_write
+            input(type="text" class="write_msg" placeholder="Type a message" id="message")
+            button(class="msg_send_btn" type="button" id="send")
+                i(class="fa fa-paper-plane-o" aria-hidden="true")
+
+block append styles
+    link(rel='stylesheet', href='/stylesheets/chat.css')

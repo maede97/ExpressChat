@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    h1 ExpressChat
+    include chat.pug
+block append scripts
+  script var username = '#{username}';
+  script(src='/javascripts/client.js')
