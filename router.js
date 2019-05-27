@@ -1,5 +1,9 @@
 var express = require('express');
 var router = express.Router();
+var createDOMPurify = require('dompurify');
+var { JSDOM } = require('jsdom');
+var window = (new JSDOM('')).window;
+var DOMPurify = createDOMPurify(window);
 
 module.exports = function (db, io) {
     router.get('/', (req, res) => {
@@ -32,8 +36,8 @@ module.exports = function (db, io) {
             res.redirect('/home');
             return;
         }
-        var username = req.body.username;
-        var password = req.body.password;
+        var username = DOMPurify.sanitize(req.body.username);
+        var password = DOMPurify.sanitize(req.body.password);
         if (username && password) {
             db.alreadyExists(username).then(row => {
                 if (row['COUNT(*)'] == 0) {
@@ -97,13 +101,13 @@ module.exports = function (db, io) {
 
     // submit new message
     router.post('/message', (req, res) => {
-        if (req.session.loggedin && req.body.message != "") {
-            db.insertMessage(req.session.username, req.body.message).then((resolve, reject) => {
+        if (req.session.loggedin && DOMPurify.sanitize(req.body.message) != "") {
+            db.insertMessage(req.session.username, DOMPurify.sanitize(req.body.message)).then((resolve, reject) => {
                 if (reject) {
                     console.log("Error on /message (using POST): " + reject);
                     res.sendStatus(500);
                 } else {
-                    io.emit('message', { mFrom: req.session.username, mTo: 'all', message: req.body.message });
+                    io.emit('message', { mFrom: req.session.username, mTo: 'all', message: DOMPurify.sanitize(req.body.message) });
                     db.updateLastAction(req.session.username).then((re, rej) => {
                         res.sendStatus(200);
                     });
@@ -116,13 +120,13 @@ module.exports = function (db, io) {
 
     // send message to specific user
     router.post('/message/:user', (req, res) => {
-        if (req.session.loggedin && req.body.message != "") {
-            db.insertPrivateMessage(req.session.username, req.params.user, req.body.message).then((resolve, reject) => {
+        if (req.session.loggedin && DOMPurify.sanitize(req.body.message) != "") {
+            db.insertPrivateMessage(req.session.username, req.params.user, DOMPurify.sanitize(req.body.message)).then((resolve, reject) => {
                 if (reject) {
                     console.log("Error on /message/:user: " + reject);
                     res.sendStatus(500);
                 } else {
-                    io.emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: req.body.message });
+                    io.emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: DOMPurify.sanitize(req.body.message) });
                     db.updateLastAction(req.session.username).then((re, rej) => {
                         res.sendStatus(200);
                     });
