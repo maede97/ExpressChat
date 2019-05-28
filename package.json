@@ -8,10 +8,12 @@
   "dependencies": {
     "bluebird": "^3.5.5",
     "body-parser": "^1.19.0",
+    "connect-busboy": "0.0.2",
     "cookie-parser": "^1.4.4",
     "debug": "~2.6.9",
     "dompurify": "^1.0.10",
     "express": "~4.16.1",
+    "express-fileupload": "^1.1.4",
     "express-session": "^1.16.1",
     "http": "0.0.0",
     "http-errors": "~1.6.3",

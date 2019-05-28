@@ -4,21 +4,33 @@ div.mesgs
             if(username == row.mFrom)
                 div.outgoing_msg
                     div.sent_msg
-                        p
-                            span #{row.message}
-                        span.time_date UTC #{row.sent}
+                        if(row.image == 0)
+                            p
+                                span #{row.message}
+                            span.time_date UTC #{row.sent}
+                        else
+                            img(src=row.message style='width: 100%;')
+                            span.time_date UTC #{row.sent}
             else
                 div.incoming_msg
                     div.received_withd_msg
-                        p
-                            a(href='/chat/'+row.mFrom) #{row.mFrom}
-                            span : #{row.message}
-                        span.time_date UTC #{row.sent}
+                        if(row.image == 0)
+                            p
+                                a(href='/chat/'+row.mFrom) #{row.mFrom}
+                                span : #{row.message}
+                            span.time_date UTC #{row.sent}
+                        else
+                            p
+                                a(href='/chat/'+row.mFrom) #{row.mFrom}
+                            img(src=row.message style='width: 100%;')
+                            span.time_date UTC #{row.sent}
     div.type_msg
         div.input_msg_write
             input(type="text" class="write_msg" placeholder="Type a message" id="message")
             button(class="msg_send_btn" type="button" id="send")
                 i(class="fa fa-paper-plane-o" aria-hidden="true")
+            form#uploadImage(method='post',action='/image',encType="multipart/form-data" ref='uploadImage')
+                input(type="file" name='image' id="image")
 
 block append styles
     link(rel='stylesheet', href='/stylesheets/chat.css')

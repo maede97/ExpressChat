@@ -63,3 +63,4 @@ typings/
 
 # Some random stuff
 database.db
+public/images/chat/*

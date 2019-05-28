@@ -15,7 +15,7 @@ module.exports = function (db, io) {
                         if (err) {
                             res.send('Error fetching your chat: ' + err);
                         } else {
-                            db.getLastOnline(req.params.user).then((row, err2) => {
+                            db.getLastOnline(req.params.user).then((r, err2) => {
                                 if (err2) {
                                     res.send('Error fetching last online');
                                 } else {
@@ -23,7 +23,7 @@ module.exports = function (db, io) {
                                         res.render('singleChat', {
                                             title: 'Chat | ' + req.params.user, name: 'chat', chat: rows,
                                             loggedin: true, username: req.session.username, toUser: req.params.user,
-                                            lastOnline: row.lastOnline
+                                            lastOnline: r.lastOnline
                                         });
                                     });
                                 }

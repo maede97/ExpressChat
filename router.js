@@ -4,10 +4,65 @@ var createDOMPurify = require('dompurify');
 var { JSDOM } = require('jsdom');
 var window = (new JSDOM('')).window;
 var DOMPurify = createDOMPurify(window);
+var fileUpload = require('express-fileupload');
+var bodyParser = require('body-parser');
 
 module.exports = function (db, io) {
     router.get('/', (req, res) => {
         res.redirect('/home');
+    });
+
+    router.post('/image', fileUpload(), (req, res) => {
+        if (req.session.loggedin) {
+            if (Object.keys(req.files).length == 0) {
+                return res.status(400).send('No files were uploaded.');
+            }
+            let image = req.files.image;
+            image.mv('./public/images/chat/' + image.name, function (err) {
+                if (err) {
+                    return res.status(500).send(err);
+                } else {
+                    db.insertImage(req.session.username, '/images/chat/' + image.name).then((re, rej) => {
+                        if (rej) {
+                            res.send('Error on insert');
+                        } else {
+                            io.emit('message', { mFrom: req.session.username, mTo: 'all', message: '/images/chat/' + image.name, image:true});
+                            db.updateLastAction(req.session.username).then((re, rej) => {
+                                res.sendStatus(200);
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            res.redirect('/login');
+        }
+    });
+    router.post('/image/:user', fileUpload(), (req, res) => {
+        if (req.session.loggedin) {
+            if (Object.keys(req.files).length == 0) {
+                return res.status(400).send('No files were uploaded.');
+            }
+            let image = req.files.image;
+            image.mv('./public/images/chat/' + image.name, function (err) {
+                if (err) {
+                    return res.status(500).send(err);
+                } else {
+                    db.insertPrivateImage(req.session.username, req.params.user, '/images/chat/' + image.name).then((re, rej) => {
+                        if (rej) {
+                            res.send('Error on insert');
+                        } else {
+                            io.emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: '/images/chat/' + image.name, image:true});
+                            db.updateLastAction(req.session.username).then((re, rej) => {
+                                res.sendStatus(200);
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            res.redirect('/login');
+        }
     });
 
     // home route
@@ -31,7 +86,7 @@ module.exports = function (db, io) {
     });
 
     // register route
-    router.post('/register', (req, res) => {
+    router.post('/register', bodyParser.urlencoded({ extended: true }), bodyParser.json(), (req, res) => {
         if (req.session.loggedin) {
             res.redirect('/home');
             return;
@@ -76,7 +131,7 @@ module.exports = function (db, io) {
     });
 
     // authentication
-    router.post('/login', (req, res) => {
+    router.post('/login', bodyParser.urlencoded({ extended: true }), bodyParser.json(), (req, res) => {
         if (req.session.loggedin) {
             res.redirect('/home');
             return;
@@ -100,7 +155,7 @@ module.exports = function (db, io) {
     });
 
     // submit new message
-    router.post('/message', (req, res) => {
+    router.post('/message', bodyParser.urlencoded({ extended: true }), bodyParser.json(), (req, res) => {
         if (req.session.loggedin && DOMPurify.sanitize(req.body.message) != "") {
             db.insertMessage(req.session.username, DOMPurify.sanitize(req.body.message)).then((resolve, reject) => {
                 if (reject) {
@@ -119,7 +174,7 @@ module.exports = function (db, io) {
     });
 
     // send message to specific user
-    router.post('/message/:user', (req, res) => {
+    router.post('/message/:user', bodyParser.urlencoded({ extended: true }), bodyParser.json(), (req, res) => {
         if (req.session.loggedin && DOMPurify.sanitize(req.body.message) != "") {
             db.insertPrivateMessage(req.session.username, req.params.user, DOMPurify.sanitize(req.body.message)).then((resolve, reject) => {
                 if (reject) {

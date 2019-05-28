@@ -12,7 +12,7 @@ class DataBase {
     `created` DATETIME DEFAULT CURRENT_TIMESTAMP, lastOnline DATETIME DEFAULT CURRENT_TIMESTAMP)');
         this.db.run('CREATE TABLE IF NOT EXISTS `chat` \
     ( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER, `to_user_id` INTEGER, `message` TEXT, \
-    `sent` DATETIME DEFAULT CURRENT_TIMESTAMP, \
+    `sent` DATETIME DEFAULT CURRENT_TIMESTAMP, image BOOLEAN DEFAULT false,\
     FOREIGN KEY(`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE, \
     FOREIGN KEY(`to_user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE)');
       }
@@ -96,7 +96,7 @@ class DataBase {
 
   getPublicMessages() {
     return new Promise((resolve, reject) => {
-      this.db.all('SELECT username as mFrom, "" as mTo, message, sent FROM chat, users WHERE chat.user_id = users.id AND chat.to_user_id IS NULL', [], (err, rows) => {
+      this.db.all('SELECT username as mFrom, "" as mTo, message, sent, image FROM chat, users WHERE chat.user_id = users.id AND chat.to_user_id IS NULL', [], (err, rows) => {
         if (err) {
           console.log('Error running sql getPublicMessages');
           console.log(err);
@@ -105,6 +105,36 @@ class DataBase {
           resolve(rows);
         }
       });
+    });
+  }
+
+  insertImage(username, image) {
+    // wants username, message
+    return new Promise((resolve, reject) => {
+      this.db.run('INSERT INTO chat (user_id, message, image) VALUES ((SELECT id FROM users WHERE username=?), ?, true)', [username, image], function (err) {
+        if (err) {
+          console.log('Error running sql insertMessage');
+          console.log(err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  insertPrivateImage(username, toUser, image) {
+    return new Promise((resolve, reject) => {
+      this.db.run('INSERT INTO chat (user_id, to_user_id, message, image) VALUES \
+      ((SELECT id FROM users WHERE username=?), (SELECT id FROM USERS WHERE username=?), ?, true)', [username, toUser, image], function (err) {
+          if (err) {
+            console.log('Error running sql insertMessage');
+            console.log(err);
+            reject(err);
+          } else {
+            resolve({ id: this.lastID });
+          }
+        });
     });
   }
 
@@ -153,10 +183,10 @@ class DataBase {
   getAllMessagesWithUser(username, other) {
     return new Promise((resolve, reject) => {
       this.db.all('SELECT * FROM (SELECT id, (SELECT username FROM users WHERE id=chat.user_id) AS mFrom, \
-      (SELECT username FROM users WHERE id=chat.to_user_id) AS mTo, message, sent FROM chat WHERE \
+      (SELECT username FROM users WHERE id=chat.to_user_id) AS mTo, message, sent,image FROM chat WHERE \
       chat.user_id = (SELECT id FROM users WHERE username=?) AND chat.to_user_id = (SELECT id FROM users WHERE username=?) UNION \
       SELECT id, (SELECT username FROM users WHERE id=chat.user_id) AS mFrom, \
-      (SELECT username FROM users WHERE id=chat.to_user_id) AS mTo, message, sent FROM chat WHERE \
+      (SELECT username FROM users WHERE id=chat.to_user_id) AS mTo, message, sent,image FROM chat WHERE \
       chat.user_id = (SELECT id FROM users WHERE username=?) AND chat.to_user_id = (SELECT id FROM users WHERE username=?)) ORDER BY id ASC',
         [username, other, other, username], (err, rows) => {
           if (err) {

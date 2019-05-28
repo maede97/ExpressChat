@@ -5,7 +5,6 @@ var session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var bodyParser = require('body-parser');
 var DataBase = require('./database');
 var app = express();
 var http = require('http').Server(app);
@@ -25,8 +24,6 @@ app.use(session({
 	saveUninitialized: true
 }));
 app.use(logger('dev'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 // do all routing
 app.use('/',Router);

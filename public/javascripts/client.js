@@ -4,6 +4,7 @@ $(() => {
       message: $("#message").val()
     });
     $("#message").val("");
+    $("#image").val("");
     $("#message").focus();
   });
   $("#message").keypress((e) => {
@@ -12,12 +13,27 @@ $(() => {
         message: $("#message").val()
       });
       $("#message").val("");
+      $("#image").val("");
     }
   });
 });
 
 function sendMessage(message) {
-  $.post(location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + '/message', message);
+  //console.log($("#image").val())
+  if ($("#image").val() != "") {
+    var fd = new FormData();
+    var files = $('#image')[0].files[0];
+    fd.append('image', files);
+    $.ajax({
+      url: '/image',
+      type: 'post',
+      data: fd,
+      contentType: false,
+      processData: false,
+    });
+  } else {
+    $.post(location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + '/message', message);
+  }
 }
 
 function formatDate() {
@@ -50,22 +66,43 @@ socket.on('register', function (data) {
 });
 
 socket.on('message', function (data) {
-  if (username == data.mFrom) {
-    $('<div class="outgoing_msg">\
-        <div class="sent_msg">\
-          <p>'+ data.message + '</p>\
-          <span class="time_date">UTC '+ formatDate() + '</span>\
-        </div>\
-      </div>').appendTo('.msg_history');
+  if (data.image && data.image == true) {
+    if (username == data.mFrom) {
+      $('<div class="outgoing_msg">\
+          <div class="sent_msg">\
+            <img src="'+ data.message + '" style="width: 100%;" />\
+            <span class="time_date">UTC '+ formatDate() + '</span>\
+          </div>\
+        </div>').appendTo('.msg_history');
+    } else {
+      $('<div class="incoming_msg">\
+          <div class="received_withd_msg">\
+            <p>\
+              <a href="/chat/'+ data.mFrom + '">' + data.mFrom + '</a>\
+            </p>\
+            <img src="'+ data.message + '" style="width: 100%;" />\
+            <span class="time_date">UTC '+ formatDate() + '</span>\
+          </div>\
+        </div>').appendTo('.msg_history');
+    }
   } else {
-    $('<div class="incoming_msg">\
-        <div class="received_withd_msg">\
-          <p>\
-            <a href="/chat/'+ data.mFrom + '">' + data.mFrom + '</a>: ' + data.message + '\
-          </p>\
-          <span class="time_date">UTC '+ formatDate() + '</span>\
-        </div>\
-      </div>').appendTo('.msg_history');
+    if (username == data.mFrom) {
+      $('<div class="outgoing_msg">\
+          <div class="sent_msg">\
+            <p>'+ data.message + '</p>\
+            <span class="time_date">UTC '+ formatDate() + '</span>\
+          </div>\
+        </div>').appendTo('.msg_history');
+    } else {
+      $('<div class="incoming_msg">\
+          <div class="received_withd_msg">\
+            <p>\
+              <a href="/chat/'+ data.mFrom + '">' + data.mFrom + '</a>: ' + data.message + '\
+            </p>\
+            <span class="time_date">UTC '+ formatDate() + '</span>\
+          </div>\
+        </div>').appendTo('.msg_history');
+    }
   }
   scrollToBottom();
 });
