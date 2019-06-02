@@ -1,3 +1,14 @@
+var socket = io();
+socket.emit('join', username);
+
+socket.on('typing-private', data => {
+  console.log(data);
+  console.log(toUser);
+  if (data.fromUser == toUser) {
+    $('.last-online').html('typing');
+  }
+});
+
 $(() => {
   $("#send").click(() => {
     sendMessage({
@@ -14,6 +25,8 @@ $(() => {
       });
       $("#message").val("");
       $("#image").val("");
+    } else {
+      socket.emit('typing-private', { 'fromUser': username, 'toUser': toUser });
     }
   });
 });
@@ -25,7 +38,7 @@ function sendMessage(message) {
     var files = $('#image')[0].files[0];
     fd.append('image', files);
     $.ajax({
-      url: '/image/'+toUser,
+      url: '/image/' + toUser,
       type: 'post',
       data: fd,
       contentType: false,
@@ -38,21 +51,26 @@ function sendMessage(message) {
 
 function formatDate() {
   let d = new Date();
-  return d.toISOString().slice(0,10) +" "+ d.toISOString().slice(11,19)
+  return d.toISOString().slice(0, 10) + " " + d.toISOString().slice(11, 19)
 }
 
 function scrollToBottom() {
   $('.msg_history').scrollTop($('.msg_history')[0].scrollHeight);
 }
 
-$(document).ready(()=>{
+$(document).ready(() => {
   scrollToBottom();
   $('#message').focus();
 });
 
 // socket stuff
-var socket = io();
-socket.on('privateMessage', function (data) {
+socket.on('privateMessage', data => {
+  // from someone else to me
+  if (data.mFrom != toUser && data.mTo == username) {
+    $('.messages').html('<div class="alert alert-info" role="alert">Private message from <a href="/chat/' + data.mFrom + '">' + data.mFrom + '</a>.');
+    return;
+  }
+  $(".typing").html("");
   if (data.image && data.image == true) {
     if (username == data.mFrom) {
       $('<div class="outgoing_msg">\

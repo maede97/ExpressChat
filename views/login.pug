@@ -3,6 +3,8 @@ extends layout
 block content
   if(warning !== undefined)
     div(class='alert alert-warning',role='alert')= warning
+  div.alert.alert-info(role='alert')
+    a(href='https://github.com/maede97/ExpressChat' target='_blank') Visit this project on Github.
   div.row
     div.col-md-6.col-md-offset-3
       div.panel.panel-login
@@ -47,7 +49,7 @@ block content
     p This tool is not intended to be secure:
     ul
       li We store passwords in cleartext.
-      li We broadcast every message sent over the ether.
+      li Messages are not encrypted.
       li Everyone can create an account, e.g. no validation.
       li Maybe some XSS and/or SQL-Injections work, we didn't test that.
 block append styles

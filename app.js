@@ -13,6 +13,19 @@ var db = new DataBase("database.db");
 var Router = require('./router')(db,io);
 var ChatRouter = require('./chatRouter')(db,io);
 
+io.on('connection',socket=> {
+	socket.on('join',data=> {
+		socket.join(data);
+	})
+	socket.on('typing-all',data=> {
+		socket.broadcast.emit('typing-all',data); // send to all except sender
+	});
+	socket.on('typing-private', data => {
+		console.log("private to " + data.toUser);
+		io.to(data.toUser).emit('typing-private',data);
+	})
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');

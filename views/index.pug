@@ -1,8 +1,11 @@
 extends layout
 
 block content
-    h1 ExpressChat
-    include chat.pug
+  div.messages
+  h1 ExpressChat
+    span.typing.last-online
+  include chat.pug
 block append scripts
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js')
   script var username = '#{username}';
   script(src='/javascripts/client.js')

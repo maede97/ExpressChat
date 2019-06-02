@@ -27,7 +27,6 @@ html
     block scripts
       script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js')
       script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js')
-      script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js')
   body
     nav.navbar.navbar-default.navbar-fixed-top
       div.container
@@ -49,3 +48,9 @@ html
                 a(href="/login") Login
     div.container.content
       block content
+  footer.footer
+    div.container
+      p.text-muted &copy; 2019 
+        i.fa.fa-github
+        | 
+        a(href="https://github.com/maede97") Matthias Busenhart

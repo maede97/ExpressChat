@@ -1,3 +1,5 @@
+var socket = io();
+socket.emit('join', username);
 $(() => {
   $("#send").click(() => {
     sendMessage({
@@ -14,6 +16,8 @@ $(() => {
       });
       $("#message").val("");
       $("#image").val("");
+    } else {
+      socket.emit('typing-all', username);
     }
   });
 });
@@ -50,22 +54,29 @@ $(document).ready(() => {
   $('#message').focus();
 });
 
-var socket = io();
-
-socket.on('login', function (data) {
+socket.on('login', data => {
   $('<div class="admin_msg"><p>' + data.user + ' just logged in.</p></div>').appendTo('.msg_history');
   scrollToBottom();
 });
-socket.on('logout', function (data) {
+socket.on('logout', data => {
   $('<div class="admin_msg"><p>' + data.user + ' just logged out.</p></div>').appendTo('.msg_history');
   scrollToBottom();
 });
-socket.on('register', function (data) {
+socket.on('register', data => {
   $('<div class="admin_msg"><p>' + data.user + ' just registered. Say Hi!</p></div>').appendTo('.msg_history');
   scrollToBottom();
 });
 
-socket.on('message', function (data) {
+socket.on('typing-all', data => {
+  $(".typing").html(data + " is now typing");
+});
+
+socket.on('privateMessage', data => {
+  $('.messages').html('<div class="alert alert-info" role="alert">Private message from <a href="/chat/' + data.mFrom + '">' + data.mFrom + '</a>.');
+});
+
+socket.on('message', data => {
+  $(".typing").html("");
   if (data.image && data.image == true) {
     if (username == data.mFrom) {
       $('<div class="outgoing_msg">\

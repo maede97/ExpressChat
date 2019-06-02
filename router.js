@@ -52,7 +52,8 @@ module.exports = function (db, io) {
                         if (rej) {
                             res.send('Error on insert');
                         } else {
-                            io.emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: '/images/chat/' + image.name, image:true});
+                            io.to(req.session.username).emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: '/images/chat/' + image.name, image:true});
+                            io.to(req.params.user).emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: '/images/chat/' + image.name, image:true});
                             db.updateLastAction(req.session.username).then((re, rej) => {
                                 res.sendStatus(200);
                             });
@@ -181,7 +182,8 @@ module.exports = function (db, io) {
                     console.log("Error on /message/:user: " + reject);
                     res.sendStatus(500);
                 } else {
-                    io.emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: DOMPurify.sanitize(req.body.message) });
+                    io.sockets.in(req.session.username).emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: DOMPurify.sanitize(req.body.message) });
+                    io.sockets.in(req.params.user).emit('privateMessage', { mFrom: req.session.username, mTo: req.params.user, message: DOMPurify.sanitize(req.body.message) });
                     db.updateLastAction(req.session.username).then((re, rej) => {
                         res.sendStatus(200);
                     });
