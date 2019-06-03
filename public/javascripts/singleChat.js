@@ -1,9 +1,9 @@
 var socket = io();
+var notification = new Audio('/plucky.mp3');
+
 socket.emit('join', username);
 
 socket.on('typing-private', data => {
-  console.log(data);
-  console.log(toUser);
   if (data.fromUser == toUser) {
     $('.last-online').html('typing');
   }
@@ -32,7 +32,6 @@ $(() => {
 });
 
 function sendMessage(message) {
-  //console.log($("#image").val())
   if ($("#image").val() != "") {
     var fd = new FormData();
     var files = $('#image')[0].files[0];
@@ -63,10 +62,10 @@ $(document).ready(() => {
   $('#message').focus();
 });
 
-// socket stuff
 socket.on('privateMessage', data => {
   // from someone else to me
   if (data.mFrom != toUser && data.mTo == username) {
+    notification.play();
     $('.messages').html('<div class="alert alert-info" role="alert">Private message from <a href="/chat/' + data.mFrom + '">' + data.mFrom + '</a>.');
     return;
   }
@@ -80,6 +79,7 @@ socket.on('privateMessage', data => {
           </div>\
         </div>').appendTo('.msg_history');
     } else {
+      notification.play();
       $('<div class="incoming_msg">\
           <div class="received_withd_msg">\
             <p>\
@@ -99,6 +99,7 @@ socket.on('privateMessage', data => {
           </div>\
         </div>').appendTo('.msg_history');
     } else {
+      notification.play();
       $('<div class="incoming_msg">\
           <div class="received_withd_msg">\
             <p>\

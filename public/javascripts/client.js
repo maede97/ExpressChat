@@ -1,4 +1,5 @@
 var socket = io();
+var notification = new Audio('/plucky.mp3');
 socket.emit('join', username);
 $(() => {
   $("#send").click(() => {
@@ -23,7 +24,6 @@ $(() => {
 });
 
 function sendMessage(message) {
-  //console.log($("#image").val())
   if ($("#image").val() != "") {
     var fd = new FormData();
     var files = $('#image')[0].files[0];
@@ -73,6 +73,7 @@ socket.on('typing-all', data => {
 
 socket.on('privateMessage', data => {
   $('.messages').html('<div class="alert alert-info" role="alert">Private message from <a href="/chat/' + data.mFrom + '">' + data.mFrom + '</a>.');
+  notification.play();
 });
 
 socket.on('message', data => {
@@ -86,6 +87,7 @@ socket.on('message', data => {
           </div>\
         </div>').appendTo('.msg_history');
     } else {
+      notification.play();
       $('<div class="incoming_msg">\
           <div class="received_withd_msg">\
             <p>\
@@ -105,6 +107,7 @@ socket.on('message', data => {
           </div>\
         </div>').appendTo('.msg_history');
     } else {
+      notification.play();
       $('<div class="incoming_msg">\
           <div class="received_withd_msg">\
             <p>\
